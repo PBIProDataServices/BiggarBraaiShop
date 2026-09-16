@@ -28,6 +28,6 @@ describe('Biggar Braai Shop', () => {
     fireEvent.click(screen.getByLabelText(/shopping bag with 1 items/i))
 
     expect(screen.getByText('Inner Circle saving')).toBeInTheDocument()
-    expect(screen.getByText(/116,99/)).toBeInTheDocument()
+    expect(screen.getAllByText(/116,99/).length).toBeGreaterThan(0)
   })
 })
