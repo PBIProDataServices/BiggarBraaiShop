@@ -1,0 +1,20 @@
+.DS_Store
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.build/
+build/
+**/Generated.xcconfig
+**/flutter_export_environment.sh
+**/Runner.xcworkspace/xcuserdata/
+**/*.iml
+.idea/
+android/.gradle/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+firepit-log.txt
+flutter_01.log
+untitled folder 2/
+android/app/.cxx/

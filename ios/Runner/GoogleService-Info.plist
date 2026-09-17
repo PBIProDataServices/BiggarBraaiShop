@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>916833155639-ebatli481pibs7ip69sh5gria3ok9i1t.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.916833155639-ebatli481pibs7ip69sh5gria3ok9i1t</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>916833155639-up1sf2arqmbiteoknna5g5na4nkrdkbs.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDiq3fKEvloN6s9OrxLYTcvcUzPGUIVNBA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>916833155639</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.biggarbraai.app</string>
+	<key>PROJECT_ID</key>
+	<string>biggarbraai</string>
+	<key>STORAGE_BUCKET</key>
+	<string>biggarbraai.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:916833155639:ios:405f248fbc963b3945ddb2</string>
+</dict>
+</plist>

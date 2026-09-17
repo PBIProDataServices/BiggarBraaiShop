@@ -1,0 +1,97 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../consts/firebase_consts.dart';
+import '../../providers/dark_theme_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../screens/auth/login.dart';
+import '../../screens/auth/register.dart';
+import '../../services/utils.dart';
+import '../../widgets/text_widget.dart';
+import 'orders_screen.dart';
+
+class AccountScreen extends StatelessWidget {
+  const AccountScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final user = authInstance.currentUser;
+    final userProvider = Provider.of<UserProvider>(context);
+    final theme = Provider.of<DarkThemeProvider>(context);
+    final color = Utils(context).color;
+    final isGuest = user == null || user.isAnonymous;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: TextWidget(
+          text: 'Account',
+          color: color,
+          textSize: 22,
+          isTitle: true,
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          TextWidget(
+            text: isGuest
+                ? 'You are shopping as a guest'
+                : (userProvider.currentUser?.name ?? user?.email ?? 'Customer'),
+            color: color,
+            textSize: 20,
+            isTitle: true,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isGuest
+                ? 'You can buy biltong without creating an account. Sign in if you want to keep order history across devices.'
+                : (user?.email ?? ''),
+            style: TextStyle(color: color.withOpacity(0.75)),
+          ),
+          const SizedBox(height: 24),
+          ListTile(
+            leading: const Icon(Icons.receipt_long),
+            title: const Text('Orders'),
+            onTap: () {
+              Navigator.of(context).pushNamed(OrdersScreen.routeName);
+            },
+          ),
+          SwitchListTile(
+            title: const Text('Dark theme'),
+            value: theme.getDarkTheme,
+            onChanged: (value) => theme.setDarkTheme = value,
+          ),
+          if (isGuest) ...[
+            ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text('Sign in'),
+              onTap: () {
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_add),
+              title: const Text('Create an account'),
+              onTap: () {
+                Navigator.of(context).pushNamed(RegisterScreen.routeName);
+              },
+            ),
+          ] else
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sign out'),
+              onTap: () async {
+                await userProvider.signOut();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Signed out. You can still shop as a guest.')),
+                  );
+                }
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}

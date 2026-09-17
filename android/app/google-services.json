@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "916833155639",
+    "project_id": "biggarbraai",
+    "storage_bucket": "biggarbraai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916833155639:android:436feaaebe4ff29645ddb2",
+        "android_client_info": {
+          "package_name": "com.biggarbraai.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916833155639-up1sf2arqmbiteoknna5g5na4nkrdkbs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.biggarbraai.app",
+            "certificate_hash": "81d0554409ed48d2adc5e87f80abbc9d873d70f5"
+          }
+        },
+        {
+          "client_id": "916833155639-a0cn8ur2a4np4rsvet53ej60r6kpc0qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3CDjxZYaykpMpP80fmRoKTcfu79bi4d0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916833155639-a0cn8ur2a4np4rsvet53ej60r6kpc0qk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "916833155639-ebatli481pibs7ip69sh5gria3ok9i1t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.biggarbraai.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916833155639:android:158f5315474b627b45ddb2",
+        "android_client_info": {
+          "package_name": "com.example.biggarbraai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916833155639-a0cn8ur2a4np4rsvet53ej60r6kpc0qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3CDjxZYaykpMpP80fmRoKTcfu79bi4d0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916833155639-a0cn8ur2a4np4rsvet53ej60r6kpc0qk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "916833155639-ebatli481pibs7ip69sh5gria3ok9i1t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.biggarbraai.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
