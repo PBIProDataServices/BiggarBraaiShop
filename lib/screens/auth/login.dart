@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 8),
                           TextWidget(
-                            text: "Sign in for order history, or continue as a guest to buy biltong.",
+                            text: "Sign in for batch progress and order history, or continue as a guest to buy biltong.",
                             color: color.withOpacity(0.7),
                             textSize: 16,
                             isTitle: false,

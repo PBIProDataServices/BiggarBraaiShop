@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +9,7 @@ import '../../screens/auth/register.dart';
 import '../../services/utils.dart';
 import '../../widgets/text_widget.dart';
 import 'orders_screen.dart';
+import 'batches_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({Key? key}) : super(key: key);
@@ -45,9 +45,9 @@ class AccountScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             isGuest
-                ? 'You can buy biltong without creating an account. Sign in if you want to keep order history across devices.'
+                ? 'You can buy biltong without an account. Sign in to follow batch progress and see when stock is likely to become available.'
                 : (user?.email ?? ''),
-            style: TextStyle(color: color.withOpacity(0.75)),
+            style: TextStyle(color: Utils(context).secondaryColor),
           ),
           const SizedBox(height: 24),
           ListTile(
@@ -55,6 +55,22 @@ class AccountScreen extends StatelessWidget {
             title: const Text('Orders'),
             onTap: () {
               Navigator.of(context).pushNamed(OrdersScreen.routeName);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.timelapse),
+            title: const Text('Batch progress'),
+            subtitle: Text(
+              isGuest
+                  ? 'Sign in to see current batches'
+                  : 'See how batches are progressing',
+            ),
+            onTap: () {
+              if (isGuest) {
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              } else {
+                Navigator.of(context).pushNamed(BatchesScreen.routeName);
+              }
             },
           ),
           SwitchListTile(

@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Text(
                     'Biltong and braai stock as soon as a partner receives a delivery.',
-                    style: TextStyle(color: color.withOpacity(0.75)),
+                    style: TextStyle(color: Utils(context).secondaryColor),
                   ),
                   const SizedBox(height: 16),
                   if (partners.isNotEmpty)
@@ -48,6 +48,8 @@ class HomeScreen extends StatelessWidget {
                         child: DropdownButton<String?>(
                           isExpanded: true,
                           value: inventory.selectedPartnerId,
+                          dropdownColor: Theme.of(context).cardColor,
+                          style: TextStyle(color: color, fontSize: 16),
                           items: [
                             const DropdownMenuItem<String?>(
                               value: null,

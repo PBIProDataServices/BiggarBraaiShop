@@ -57,7 +57,7 @@ class ShopListingCard extends StatelessWidget {
                       listing.partnerName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: color.withOpacity(0.7), fontSize: 12),
+                      style: TextStyle(color: color.withOpacity(0.85), fontSize: 12),
                     ),
                   ),
                 ],

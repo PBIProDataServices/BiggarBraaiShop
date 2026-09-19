@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:biggar_braai_shop/providers/cart_provider.dart';
 import 'package:biggar_braai_shop/providers/dark_theme_provider.dart';
 import 'package:biggar_braai_shop/screens/shop/account_screen.dart';
+import 'package:biggar_braai_shop/screens/shop/batches_screen.dart';
 import 'package:biggar_braai_shop/screens/shop/cart_screen.dart';
 import 'package:biggar_braai_shop/screens/shop/home_screen.dart';
 import 'package:biggar_braai_shop/widgets/text_widget.dart';
@@ -21,6 +22,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
+    BatchesScreen(),
     CartScreen(),
     AccountScreen(),
   ];
@@ -38,13 +40,19 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         currentIndex: _selectedIndex,
-        unselectedItemColor: isDark ? Colors.white30 : Colors.black38,
+        unselectedItemColor: isDark ? Colors.white70 : Colors.black54,
         selectedItemColor: isDark ? Colors.lightBlue.shade200 : Colors.black87,
         onTap: (index) => setState(() => _selectedIndex = index),
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(_selectedIndex == 0 ? IconlyBold.home : IconlyLight.home),
             label: 'Shop',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              _selectedIndex == 1 ? IconlyBold.activity : IconlyLight.activity,
+            ),
+            label: 'Batches',
           ),
           BottomNavigationBarItem(
             icon: Consumer<CartProvider>(
@@ -57,7 +65,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                     textSize: 12,
                   ),
                   child: Icon(
-                    _selectedIndex == 1 ? IconlyBold.buy : IconlyLight.buy,
+                    _selectedIndex == 2 ? IconlyBold.buy : IconlyLight.buy,
                   ),
                 );
               },
@@ -66,7 +74,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              _selectedIndex == 2 ? IconlyBold.user2 : IconlyLight.user2,
+              _selectedIndex == 3 ? IconlyBold.user2 : IconlyLight.user2,
             ),
             label: 'Account',
           ),

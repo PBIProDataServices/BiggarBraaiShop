@@ -15,6 +15,20 @@ Shop listings come from partner **deliveries**:
 
 Pricing and descriptions come from `stock_types`. Pickup location comes from `partners`.
 
+## Batch progress (signed-in customers)
+
+Guests can shop. **Signing in** unlocks the Batches tab, which reads the same Admin tables (`batch`, `batch_step_instances`, `batch_types`).
+
+Customers see current (not completed) batches only:
+
+- overall % complete
+- number of steps to complete, in progress, and completed
+- when that batch is **likely to become available** (`endDate`)
+
+Step names, photos, notes, and evidence are not shown.
+
+Anonymous guest checkout does not unlock this view.
+
 ## Guest checkout
 
 - Browse and add to basket with no login.

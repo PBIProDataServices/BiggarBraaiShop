@@ -9,6 +9,7 @@ import 'package:biggar_braai_shop/providers/user_provider.dart';
 import 'package:biggar_braai_shop/providers/cart_provider.dart';
 import 'package:biggar_braai_shop/providers/shop_inventory_provider.dart';
 import 'package:biggar_braai_shop/providers/orders_provider.dart';
+import 'package:biggar_braai_shop/providers/batch_progress_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'package:biggar_braai_shop/consts/theme_data.dart';
@@ -19,6 +20,7 @@ import 'package:biggar_braai_shop/screens/auth/register.dart';
 import 'package:biggar_braai_shop/screens/shop/checkout_screen.dart';
 import 'package:biggar_braai_shop/screens/shop/listing_details_screen.dart';
 import 'package:biggar_braai_shop/screens/shop/orders_screen.dart';
+import 'package:biggar_braai_shop/screens/shop/batches_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,11 +33,18 @@ Future<void> main() async {
     debugPrint('Error initializing Firebase: $e');
   }
 
-  Stripe.publishableKey =
-      'pk_live_51K2Og6RnlFRMO2nqu2kJOL4LABn7RfWAjITTXp9dgPXI4N36eMFcit34FKLt2abXOomUMH6pHPa4qpOGRhRMyOwg00WxFpUP4f';
-  Stripe.merchantIdentifier = 'Biggar Braai Shop';
-  if (!kIsWeb) {
-    await Stripe.instance.applySettings();
+  final stripeSupported = !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android);
+  if (stripeSupported) {
+    try {
+      Stripe.publishableKey =
+          'pk_live_51K2Og6RnlFRMO2nqu2kJOL4LABn7RfWAjITTXp9dgPXI4N36eMFcit34FKLt2abXOomUMH6pHPa4qpOGRhRMyOwg00WxFpUP4f';
+      Stripe.merchantIdentifier = 'merchant.com.biggarbraai.shop';
+      await Stripe.instance.applySettings();
+    } catch (e) {
+      debugPrint('Error initializing Stripe: $e');
+    }
   }
   runApp(const MyApp());
 }
@@ -86,6 +95,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
           create: (_) => OrdersProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => BatchProgressProvider(),
+        ),
       ],
       child: Consumer<DarkThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -103,6 +115,7 @@ class _MyAppState extends State<MyApp> {
                   const ListingDetailsScreen(),
               CheckoutScreen.routeName: (ctx) => const CheckoutScreen(),
               OrdersScreen.routeName: (ctx) => const OrdersScreen(),
+              BatchesScreen.routeName: (ctx) => const BatchesScreen(),
             },
           );
         },

@@ -57,7 +57,7 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
           const SizedBox(height: 8),
           Text('From ${listing.partnerName}', style: TextStyle(color: color)),
           Text(listing.partnerAddress,
-              style: TextStyle(color: color.withOpacity(0.7))),
+              style: TextStyle(color: color.withOpacity(0.85))),
           const SizedBox(height: 12),
           Text(listing.description, style: TextStyle(color: color)),
           const SizedBox(height: 16),
@@ -67,7 +67,10 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
             textSize: 22,
             isTitle: true,
           ),
-          Text('${listing.quantity} available from this delivery'),
+          Text(
+            '${listing.quantity} available from this delivery',
+            style: TextStyle(color: color),
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _qtyController,

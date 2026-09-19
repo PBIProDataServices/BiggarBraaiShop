@@ -11,6 +11,7 @@ import '../../providers/user_provider.dart';
 import '../../screens/loading_manager.dart';
 import '../../services/global_methods.dart';
 import '../../services/stripe_service.dart';
+import '../../services/utils.dart';
 import '../../widgets/robot_check.dart';
 import '../../widgets/text_widget.dart';
 
@@ -149,13 +150,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           children: [
             TextWidget(
               text: 'Total  £${cart.total.toStringAsFixed(2)}',
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+              color: Utils(context).color,
               textSize: 22,
               isTitle: true,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'No account needed. We only use these details for this order.',
+              style: TextStyle(color: Utils(context).secondaryColor),
             ),
             const SizedBox(height: 16),
             Form(
