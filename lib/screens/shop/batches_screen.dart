@@ -134,7 +134,7 @@ class _BatchListState extends State<_BatchList> {
                         Center(
                           child: Text(
                             provider.error ??
-                                'No batches in progress right now.',
+                                'No upcoming batches right now.',
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -170,11 +170,37 @@ class _BatchSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextWidget(
-              text: '${batch.batchTypeName}  #${batch.batchId}',
-              color: color,
-              textSize: 18,
-              isTitle: true,
+            Row(
+              children: [
+                Expanded(
+                  child: TextWidget(
+                    text: '${batch.batchTypeName}  #${batch.batchId}',
+                    color: color,
+                    textSize: 18,
+                    isTitle: true,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: batch.statusLabel == 'In progress'
+                        ? Colors.orange.withOpacity(0.16)
+                        : Colors.blue.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    batch.statusLabel,
+                    style: TextStyle(
+                      color: batch.statusLabel == 'In progress'
+                          ? Colors.orange[800]
+                          : Colors.blue[800],
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             LinearProgressIndicator(

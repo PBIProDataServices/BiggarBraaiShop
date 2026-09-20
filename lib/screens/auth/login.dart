@@ -1,21 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:biggar_braai_shop/consts/contss.dart';
+import 'package:biggar_braai_shop/fetch_screen.dart';
+import 'package:biggar_braai_shop/providers/dark_theme_provider.dart';
+import 'package:biggar_braai_shop/providers/user_provider.dart';
 import 'package:biggar_braai_shop/screens/auth/forget_pass.dart';
 import 'package:biggar_braai_shop/screens/auth/register.dart';
 import 'package:biggar_braai_shop/screens/loading_manager.dart';
+import 'package:biggar_braai_shop/services/auth_service.dart';
 import 'package:biggar_braai_shop/services/global_methods.dart';
 import 'package:biggar_braai_shop/widgets/text_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:biggar_braai_shop/consts/contss.dart';
-import 'package:biggar_braai_shop/consts/firebase_consts.dart';
-import 'package:biggar_braai_shop/fetch_screen.dart';
-import 'package:biggar_braai_shop/providers/user_provider.dart';
-import 'package:biggar_braai_shop/providers/dark_theme_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/LoginScreen';
@@ -51,24 +50,18 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
       try {
-        // First try to sign in with email and password
-      try {
-        await authInstance.signInWithEmailAndPassword(
+        await AuthService.signInWithEmail(
           email: _emailTextController.text.toLowerCase().trim(),
           password: _passTextController.text.trim(),
         );
-        } catch (error) {
-         //do nothing it always throws a stupid pigion error.
-        }
-        
-        // Add a brief waiting period for better UX
-        await Future.delayed(const Duration(seconds: 3)); 
-        
-        // Store the email for biometric authentication
+
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('last_user_email', _emailTextController.text.toLowerCase().trim());
-        
-        // Fetch user data after successful login and profile check
+        await prefs.setString(
+          'last_user_email',
+          _emailTextController.text.toLowerCase().trim(),
+        );
+
+        if (!mounted) return;
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.fetchUserData();
 

@@ -6,7 +6,7 @@ import 'package:biggar_braai_shop/screens/auth/login.dart';
 import 'package:biggar_braai_shop/screens/loading_manager.dart';
 
 import 'package:biggar_braai_shop/consts/contss.dart';
-import 'package:biggar_braai_shop/consts/firebase_consts.dart';
+import 'package:biggar_braai_shop/services/auth_service.dart';
 import 'package:biggar_braai_shop/services/global_methods.dart';
 import 'package:biggar_braai_shop/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -52,12 +52,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
       try {
-        await authInstance.createUserWithEmailAndPassword(
+        final user = await AuthService.createUserWithEmail(
           email: _emailTextController.text.toLowerCase().trim(),
           password: _passTextController.text.trim(),
         );
-        final User? user = authInstance.currentUser;
-        final _uid = user!.uid;
+        final _uid = user.uid;
         await FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'id': _uid,
           'name': _nameTextController.text,

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,11 +17,43 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = authInstance.currentUser;
-    final userProvider = Provider.of<UserProvider>(context);
-    final theme = Provider.of<DarkThemeProvider>(context);
-    final color = Utils(context).color;
-    final isGuest = user == null || user.isAnonymous;
+    return StreamBuilder<User?>(
+      stream: authInstance.authStateChanges(),
+      builder: (context, snapshot) {
+        final user = snapshot.data ?? authInstance.currentUser;
+        final userProvider = Provider.of<UserProvider>(context);
+        final theme = Provider.of<DarkThemeProvider>(context);
+        final color = Utils(context).color;
+        final isGuest = user == null || user.isAnonymous;
+        return _AccountBody(
+          user: user,
+          isGuest: isGuest,
+          userProvider: userProvider,
+          theme: theme,
+          color: color,
+        );
+      },
+    );
+  }
+}
+
+class _AccountBody extends StatelessWidget {
+  const _AccountBody({
+    required this.user,
+    required this.isGuest,
+    required this.userProvider,
+    required this.theme,
+    required this.color,
+  });
+
+  final User? user;
+  final bool isGuest;
+  final UserProvider userProvider;
+  final DarkThemeProvider theme;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(

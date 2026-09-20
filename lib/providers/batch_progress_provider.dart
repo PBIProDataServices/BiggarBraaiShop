@@ -17,8 +17,15 @@ class BatchProgressProvider with ChangeNotifier {
   String? get error => _error;
 
   List<ShopBatch> get currentBatches {
-    return _batches.where((batch) => !batch.isComplete).toList()
-      ..sort((a, b) => a.batchId.compareTo(b.batchId));
+    final upcoming = _batches.where((batch) => batch.isUpcoming).toList();
+    upcoming.sort((a, b) {
+      final statusOrder = a.sortRank.compareTo(b.sortRank);
+      if (statusOrder != 0) return statusOrder;
+      final dateOrder = a.endDate.compareTo(b.endDate);
+      if (dateOrder != 0) return dateOrder;
+      return a.batchId.compareTo(b.batchId);
+    });
+    return upcoming;
   }
 
   Future<void> fetchBatches() async {
@@ -37,30 +44,20 @@ class BatchProgressProvider with ChangeNotifier {
     try {
       await _loadBatchTypes();
       final snapshot = await _db.collection('batch').get();
+      final stepCounts = await _loadAllStepCounts();
       final next = <ShopBatch>[];
 
       for (final doc in snapshot.docs) {
         try {
           final data = doc.data();
-          final status = (data['status'] ?? 'unknown').toString();
-          if (status.toLowerCase() == 'completed' ||
-              status.toLowerCase() == 'cancelled' ||
-              status.toLowerCase() == 'canceled') {
-            continue;
-          }
-
-          final batchId = data['batchId'] ?? 0;
-          final counts = await _stepCounts(batchId.toString());
-          if (counts.total > 0 && counts.completed >= counts.total) {
-            continue;
-          }
-
+          final batchId = _parseBatchId(data['batchId'] ?? doc.id);
+          final counts = stepCounts[batchId.toString()] ?? const _StepCounts();
+          final status = (data['status'] ?? 'pending').toString();
           final typeId = (data['batchTypeId'] ?? 'biltong').toString();
+
           next.add(
             ShopBatch(
-              batchId: batchId is int
-                  ? batchId
-                  : int.tryParse(batchId.toString()) ?? 0,
+              batchId: batchId,
               status: status,
               startDate: _toDate(data['startDate']) ?? DateTime.now(),
               endDate: _toDate(data['endDate']) ??
@@ -80,6 +77,7 @@ class BatchProgressProvider with ChangeNotifier {
       _batches = next;
     } catch (error) {
       _error = error.toString();
+      _batches = [];
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -99,36 +97,55 @@ class BatchProgressProvider with ChangeNotifier {
     }
   }
 
-  Future<_StepCounts> _stepCounts(String batchId) async {
-    final snapshot = await _db
-        .collection('batch_step_instances')
-        .where('batchId', isEqualTo: batchId)
-        .get();
+  Future<Map<String, _StepCounts>> _loadAllStepCounts() async {
+    try {
+      final snapshot = await _db.collection('batch_step_instances').get();
+      final grouped = <String, List<String>>{};
 
-    var toComplete = 0;
-    var inProgress = 0;
-    var completed = 0;
-
-    for (final doc in snapshot.docs) {
-      final key = (doc.data()['status'] ?? 'pending').toString().toLowerCase();
-      if (key == 'completed') {
-        completed++;
-      } else if (key == 'in progress' ||
-          key == 'in_progress' ||
-          key == 'started' ||
-          key == 'processing') {
-        inProgress++;
-      } else {
-        toComplete++;
+      for (final doc in snapshot.docs) {
+        final key = (doc.data()['batchId'] ?? '').toString();
+        if (key.isEmpty) continue;
+        grouped.putIfAbsent(key, () => []).add(
+              (doc.data()['status'] ?? 'pending').toString().toLowerCase(),
+            );
       }
-    }
 
-    return _StepCounts(
-      toComplete: toComplete,
-      inProgress: inProgress,
-      completed: completed,
-      total: snapshot.docs.length,
-    );
+      return grouped.map((key, statuses) {
+        var toComplete = 0;
+        var inProgress = 0;
+        var completed = 0;
+        for (final status in statuses) {
+          if (status == 'completed' || status == 'closed' || status == 'done') {
+            completed++;
+          } else if (status == 'in progress' ||
+              status == 'in_progress' ||
+              status == 'started' ||
+              status == 'processing') {
+            inProgress++;
+          } else {
+            toComplete++;
+          }
+        }
+        return MapEntry(
+          key,
+          _StepCounts(
+            toComplete: toComplete,
+            inProgress: inProgress,
+            completed: completed,
+            total: statuses.length,
+          ),
+        );
+      });
+    } catch (error) {
+      debugPrint('Step instances not readable: $error');
+      return {};
+    }
+  }
+
+  int _parseBatchId(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
   }
 
   DateTime? _toDate(dynamic value) {
@@ -150,9 +167,9 @@ class _StepCounts {
   final int total;
 
   const _StepCounts({
-    required this.toComplete,
-    required this.inProgress,
-    required this.completed,
-    required this.total,
+    this.toComplete = 0,
+    this.inProgress = 0,
+    this.completed = 0,
+    this.total = 0,
   });
 }

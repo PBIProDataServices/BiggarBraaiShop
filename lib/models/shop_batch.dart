@@ -21,10 +21,48 @@ class ShopBatch {
     required this.stepsTotal,
   });
 
+  String get _statusKey =>
+      status.toLowerCase().trim().replaceAll(' ', '_');
+
+  bool get isClosed {
+    return _statusKey == 'completed' ||
+        _statusKey == 'closed' ||
+        _statusKey == 'cancelled' ||
+        _statusKey == 'canceled' ||
+        _statusKey == 'done';
+  }
+
   bool get isComplete {
-    final statusKey = status.toLowerCase();
-    if (statusKey == 'completed') return true;
+    if (isClosed) return true;
     return stepsTotal > 0 && stepsCompleted >= stepsTotal;
+  }
+
+  bool get isUpcoming => !isComplete;
+
+  String get statusLabel {
+    switch (_statusKey) {
+      case 'in_progress':
+        return 'In progress';
+      case 'pending':
+      case 'planned':
+      case 'upcoming':
+        return 'Coming up';
+      default:
+        return status.isEmpty ? 'Coming up' : status;
+    }
+  }
+
+  int get sortRank {
+    switch (_statusKey) {
+      case 'in_progress':
+        return 0;
+      case 'pending':
+      case 'planned':
+      case 'upcoming':
+        return 1;
+      default:
+        return 2;
+    }
   }
 
   double get completionPercentage =>
