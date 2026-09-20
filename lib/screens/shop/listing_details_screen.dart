@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/shop_inventory_provider.dart';
 import '../../services/utils.dart';
+import '../../widgets/html_details_view.dart';
+import '../../widgets/product_image.dart';
 import '../../widgets/text_widget.dart';
 
 class ListingDetailsScreen extends StatefulWidget {
@@ -17,6 +19,7 @@ class ListingDetailsScreen extends StatefulWidget {
 
 class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
   final _qtyController = TextEditingController(text: '1');
+  int _imageIndex = 0;
 
   @override
   void dispose() {
@@ -40,13 +43,59 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
     }
 
     final qty = int.tryParse(_qtyController.text) ?? 1;
+    final gallery = listing.galleryUrls;
 
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Image.asset(listing.imageAsset, height: 180),
+          if (gallery.isEmpty)
+            ProductImage(
+              imageUrl: listing.featureImageUrl,
+              fallbackAsset: listing.imageAsset,
+              height: 220,
+              fit: BoxFit.contain,
+            )
+          else
+            Column(
+              children: [
+                SizedBox(
+                  height: 220,
+                  child: PageView.builder(
+                    itemCount: gallery.length,
+                    onPageChanged: (index) => setState(() => _imageIndex = index),
+                    itemBuilder: (context, index) {
+                      return ProductImage(
+                        imageUrl: gallery[index],
+                        fallbackAsset: listing.imageAsset,
+                        fit: BoxFit.contain,
+                      );
+                    },
+                  ),
+                ),
+                if (gallery.length > 1) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (var i = 0; i < gallery.length; i++)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: i == _imageIndex
+                                ? Theme.of(context).primaryColor
+                                : color.withOpacity(0.25),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
           const SizedBox(height: 16),
           TextWidget(
             text: listing.productType,
@@ -58,8 +107,6 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
           Text('From ${listing.partnerName}', style: TextStyle(color: color)),
           Text(listing.partnerAddress,
               style: TextStyle(color: color.withOpacity(0.85))),
-          const SizedBox(height: 12),
-          Text(listing.description, style: TextStyle(color: color)),
           const SizedBox(height: 16),
           TextWidget(
             text: '£${listing.price.toStringAsFixed(2)} / ${listing.unitLabel}',
@@ -71,6 +118,8 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
             '${listing.quantity} available from this delivery',
             style: TextStyle(color: color),
           ),
+          const SizedBox(height: 20),
+          HtmlDetailsView(html: listing.displayHtml, color: color),
           const SizedBox(height: 16),
           TextField(
             controller: _qtyController,

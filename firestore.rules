@@ -1,6 +1,43 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDocPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function userData() {
+      return get(userDocPath()).data;
+    }
+
+    // Admins are flagged on the user document (userRoles), not only custom claims.
+    // A crash in this function is treated as deny, so missing fields must be safe.
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.get('admin', false) == true ||
+        (
+          exists(userDocPath()) &&
+          (
+            (userData().get('userRoles', []) is list &&
+              userData().userRoles.hasAny(['Admin', 'admin'])) ||
+            userData().get('userRoles', '') == 'Admin' ||
+            userData().get('userRole', '') == 'Admin'
+          )
+        )
+      );
+    }
+
+    function isPartnerOwner(partnerId) {
+      return isSignedIn() &&
+        partnerId is string &&
+        exists(/databases/$(database)/documents/partners/$(partnerId)) &&
+        get(/databases/$(database)/documents/partners/$(partnerId)).data.userId
+          == request.auth.uid;
+    }
+
     match /customers/{uid} {
       allow read: if request.auth.uid == uid;
 
@@ -14,45 +51,45 @@ service cloud.firestore {
         allow read: if request.auth.uid == uid;
       }
     }
-    
+
     match /users/{uid} {
       allow read, write: if request.auth.uid == uid;
-			}
-      
+    }
+
     match /partners/{id} {
-      	allow read: if true
-      	}
-    
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || isPartnerOwner(id);
+      allow delete: if isAdmin();
+    }
+
     match /stages/{id} {
-      	allow read: if true
-      	}
+      allow read: if true;
+    }
 
     match /batch/{id} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-			}
-    match /batch_steps/{stepId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if isAdmin();
     }
 
-    match /batch_types/{id} {
+    match /batch_steps/{stepId} {
       allow read: if true;
+      allow write: if isAdmin();
     }
-    
+
+    match /batch_types/{typeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /batch_step_instances/{instanceId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
-    
+
     match /batch_step_images/{imageId} {
       allow read: if true;
-      allow write: if request.auth != null;
-    }
-    
-    match /batch/{batchId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if isSignedIn();
     }
 
     match /supply/{id} {
@@ -64,7 +101,13 @@ service cloud.firestore {
     }
 
     match /stock/{id} {
-      allow read, write: if true;
+      allow read: if isSignedIn();
+      allow create: if isAdmin() || isPartnerOwner(request.resource.data.partnerId);
+      allow update: if isAdmin() || (
+        isPartnerOwner(resource.data.partnerId) &&
+        request.resource.data.partnerId == resource.data.partnerId
+      );
+      allow delete: if isAdmin();
     }
 
     match /stock_history/{id} {
@@ -72,7 +115,8 @@ service cloud.firestore {
     }
 
     match /sales/{id} {
-      allow read, write: if true;
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
     }
 
     match /payouts/{id} {
@@ -80,7 +124,8 @@ service cloud.firestore {
     }
 
     match /stock_types/{id} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /stock_alerts/{id} {

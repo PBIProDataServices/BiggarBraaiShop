@@ -6,6 +6,7 @@ import '../../providers/cart_provider.dart';
 import '../../providers/shop_inventory_provider.dart';
 import '../../services/utils.dart';
 import '../../widgets/empty_screen.dart';
+import '../../widgets/product_image.dart';
 import '../../widgets/text_widget.dart';
 import 'checkout_screen.dart';
 
@@ -74,7 +75,13 @@ class CartScreen extends StatelessWidget {
                 final listing = inventory.findByStockId(item.stockId);
                 final maxQty = listing?.quantity ?? item.quantity;
                 return ListTile(
-                  leading: Image.asset(item.imageAsset, width: 48),
+                  leading: ProductImage(
+                    imageUrl: item.imageUrl,
+                    fallbackAsset: item.imageAsset,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                  ),
                   title: Text(item.productType),
                   subtitle: Text(
                     '${item.partnerName}\n£${item.unitPrice.toStringAsFixed(2)} each',

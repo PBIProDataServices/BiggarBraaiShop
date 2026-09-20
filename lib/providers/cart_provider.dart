@@ -29,6 +29,7 @@ class CartProvider with ChangeNotifier {
         unitPrice: listing.price,
         weightRequired: listing.weightRequired,
         imageAsset: listing.imageAsset,
+        imageUrl: listing.featureImageUrl,
         quantity: quantity > listing.quantity ? listing.quantity : quantity,
       );
     }

@@ -34,6 +34,9 @@ class StockTypeProvider with ChangeNotifier {
     required String description,
     required bool weightRequired,
     required double price,
+    String detailsHtml = '',
+    String featureImageUrl = '',
+    List<String> imageUrls = const [],
   }) async {
     try {
       final now = DateTime.now();
@@ -41,8 +44,11 @@ class StockTypeProvider with ChangeNotifier {
         id: '',
         name: name,
         description: description,
+        detailsHtml: detailsHtml,
         weightRequired: weightRequired,
         price: price,
+        featureImageUrl: featureImageUrl,
+        imageUrls: imageUrls,
         createdAt: now,
         updatedAt: now,
       );
@@ -51,7 +57,18 @@ class StockTypeProvider with ChangeNotifier {
           .collection('stock_types')
           .add(stockType.toMap());
 
-      _stockTypes[docRef.id] = stockType;
+      _stockTypes[docRef.id] = StockTypeModel(
+        id: docRef.id,
+        name: name,
+        description: description,
+        detailsHtml: detailsHtml,
+        weightRequired: weightRequired,
+        price: price,
+        featureImageUrl: featureImageUrl,
+        imageUrls: imageUrls,
+        createdAt: now,
+        updatedAt: now,
+      );
       notifyListeners();
     } catch (error) {
       debugPrint('Error adding stock type: $error');
@@ -80,17 +97,27 @@ class StockTypeProvider with ChangeNotifier {
     required String description,
     required bool weightRequired,
     required double price,
+    String? detailsHtml,
+    String? featureImageUrl,
+    List<String>? imageUrls,
   }) async {
     try {
       final now = Timestamp.fromDate(DateTime.now());
+      final existing = _stockTypes[id];
+      final nextDetails = detailsHtml ?? existing?.detailsHtml ?? '';
+      final nextFeature = featureImageUrl ?? existing?.featureImageUrl ?? '';
+      final nextImages = imageUrls ?? existing?.imageUrls ?? const [];
       await FirebaseFirestore.instance
           .collection('stock_types')
           .doc(id)
           .update({
             'name': name,
             'description': description,
+            'detailsHtml': nextDetails,
             'weightRequired': weightRequired,
             'price': price,
+            'featureImageUrl': nextFeature,
+            'imageUrls': nextImages,
             'updatedAt': now,
           });
 
@@ -98,16 +125,19 @@ class StockTypeProvider with ChangeNotifier {
         id: id,
         name: name,
         description: description,
+        detailsHtml: nextDetails,
         weightRequired: weightRequired,
         price: price,
-        createdAt: _stockTypes[id]!.createdAt,
+        featureImageUrl: nextFeature,
+        imageUrls: nextImages,
+        createdAt: existing?.createdAt ?? now.toDate(),
         updatedAt: now.toDate(),
       );
-      
+
       notifyListeners();
     } catch (error) {
       debugPrint('Error updating stock type: $error');
       rethrow;
     }
   }
-} 
+}

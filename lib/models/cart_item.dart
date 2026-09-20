@@ -8,6 +8,7 @@ class CartItem with ChangeNotifier {
   final double unitPrice;
   final bool weightRequired;
   final String imageAsset;
+  final String imageUrl;
   int quantity;
 
   CartItem({
@@ -18,6 +19,7 @@ class CartItem with ChangeNotifier {
     required this.unitPrice,
     required this.weightRequired,
     required this.imageAsset,
+    this.imageUrl = '',
     required this.quantity,
   });
 

@@ -16,7 +16,9 @@ class ShopInventoryProvider with ChangeNotifier {
   List<ShopListing> _listings = [];
   List<PartnerModel> _partners = [];
   Map<String, StockTypeModel> _stockTypesByName = {};
+  QuerySnapshot<Map<String, dynamic>>? _lastStockSnap;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _stockSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _typesSub;
   String? _selectedPartnerId;
   bool _isLoading = false;
   String? _error;
@@ -44,8 +46,16 @@ class ShopInventoryProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _loadLookups();
+      await _loadPartners();
       await _stockSub?.cancel();
+      await _typesSub?.cancel();
+      _typesSub = _db.collection('stock_types').snapshots().listen(
+        _onTypesSnapshot,
+        onError: (error) {
+          _error = error.toString();
+          notifyListeners();
+        },
+      );
       _stockSub = _db.collection('stock').snapshots().listen(
         _onStockSnapshot,
         onError: (error) {
@@ -61,23 +71,32 @@ class ShopInventoryProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _loadLookups() async {
+  Future<void> _loadPartners() async {
     final partnersSnap = await _db.collection('partners').get();
     _partners = partnersSnap.docs
         .map(PartnerModel.fromFirestore)
         .where((partner) => partner.enabled)
         .toList();
+  }
 
-    final typesSnap = await _db.collection('stock_types').get();
+  void _onTypesSnapshot(QuerySnapshot<Map<String, dynamic>> snapshot) {
     _stockTypesByName = {};
-    for (final doc in typesSnap.docs) {
+    for (final doc in snapshot.docs) {
       final type = StockTypeModel.fromFirestore(doc);
       _stockTypesByName[type.name.trim().toLowerCase()] = type;
       _stockTypesByName[doc.id.trim().toLowerCase()] = type;
     }
+    if (_lastStockSnap != null) {
+      _rebuildListings(_lastStockSnap!);
+    }
   }
 
   void _onStockSnapshot(QuerySnapshot<Map<String, dynamic>> snapshot) {
+    _lastStockSnap = snapshot;
+    _rebuildListings(snapshot);
+  }
+
+  void _rebuildListings(QuerySnapshot<Map<String, dynamic>> snapshot) {
     final next = <ShopListing>[];
     for (final doc in snapshot.docs) {
       try {
@@ -104,10 +123,14 @@ class ShopInventoryProvider with ChangeNotifier {
             partnerName: partner.partnerName,
             partnerAddress: _formatAddress(partner),
             price: stockType?.price ?? 0,
-            description: stockType?.description ??
-                'Fresh ${stock.productType} delivered to ${partner.partnerName}.',
+            description: stockType?.summaryText.isNotEmpty == true
+                ? stockType!.summaryText
+                : 'Fresh ${stock.productType} delivered to ${partner.partnerName}.',
+            detailsHtml: stockType?.displayHtml ?? '',
             weightRequired: stockType?.weightRequired ?? false,
             imageAsset: _imageForProduct(stock.productType),
+            featureImageUrl: stockType?.featureImageUrl ?? '',
+            imageUrls: stockType?.imageUrls ?? const [],
           ),
         );
       } catch (error) {
@@ -155,6 +178,7 @@ class ShopInventoryProvider with ChangeNotifier {
   @override
   void dispose() {
     _stockSub?.cancel();
+    _typesSub?.cancel();
     super.dispose();
   }
 }

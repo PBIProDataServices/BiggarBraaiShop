@@ -128,7 +128,7 @@ class OrdersProvider with ChangeNotifier {
         'stage': 'Awaiting Confirmation',
         'partnerId': items.first.partnerId,
         'productId': items.first.stockId,
-        'imageUrl': '',
+        'imageUrl': items.first.imageUrl,
         'orderDate': Timestamp.now(),
         'items': items
             .map((item) => {

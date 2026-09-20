@@ -5,6 +5,7 @@ import '../models/shop_listing.dart';
 import '../providers/cart_provider.dart';
 import '../screens/shop/listing_details_screen.dart';
 import '../services/utils.dart';
+import 'product_image.dart';
 import 'text_widget.dart';
 
 class ShopListingCard extends StatelessWidget {
@@ -36,7 +37,11 @@ class ShopListingCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Center(
-                  child: Image.asset(listing.imageAsset, fit: BoxFit.contain),
+                  child: ProductImage(
+                    imageUrl: listing.featureImageUrl,
+                    fallbackAsset: listing.imageAsset,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
